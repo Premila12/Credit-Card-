@@ -12,7 +12,7 @@ pip install -r requirements.txt
 
 ### 2. Initialize System (One-Time)
 ```bash
-python src/initialize_cl_system.py
+python src/scripts/initialize_cl_system.py
 ```
 
 ### 3. Run Dashboard
@@ -42,19 +42,23 @@ HDFC_Credit_Card/
 │   └── risk_model_development.ipynb  # EDA & model development
 ├── src/
 │   ├── app.py                # Streamlit dashboard
-│   ├── risk_engine.py        # Risk scoring engine
-│   ├── data_loader.py        # Data loading utilities
-│   ├── train_model.py        # Model training script
-│   ├── convert_data.py       # Excel to CSV converter
 │   ├── ml_pipeline/          # Continuous learning modules
 │   │   ├── data_manager.py
 │   │   ├── model_trainer.py
 │   │   ├── model_validator.py
 │   │   ├── model_deployer.py
 │   │   └── scheduler.py
-│   ├── retrain_manual.py     # Manual retraining trigger
-│   ├── rollback.py           # Model rollback utility
-│   └── initialize_cl_system.py
+│   ├── utils/                # Helper utilities
+│   │   ├── data_loader.py
+│   │   ├── risk_engine.py
+│   │   └── convert_data.py
+│   ├── scripts/              # Execution scripts
+│   │   ├── train_model.py
+│   │   ├── retrain_manual.py
+│   │   ├── rollback.py
+│   │   └── initialize_cl_system.py
+│   └── assets/               # Static assets
+│       └── style.css
 ├── assets/
 │   └── logo.png              # HDFC Bank logo
 ├── logs/
@@ -93,7 +97,7 @@ HDFC_Credit_Card/
 
 ### Manual Retraining
 ```bash
-python src/retrain_manual.py
+python src/scripts/retrain_manual.py
 ```
 
 ### Start Automated Scheduler
@@ -104,13 +108,13 @@ python src/ml_pipeline/scheduler.py
 ### Rollback Model
 ```bash
 # View history
-python src/rollback.py --list
+python src/scripts/rollback.py --list
 
 # Rollback to previous
-python src/rollback.py
+python src/scripts/rollback.py
 
 # Rollback to specific version
-python src/rollback.py --version 1.2
+python src/scripts/rollback.py --version 1.2
 ```
 
 ---

@@ -4,7 +4,7 @@
 
 ### 1. Initialize the System (One-Time Setup)
 ```bash
-python src/initialize_cl_system.py
+python src/scripts/initialize_cl_system.py
 ```
 
 This will:
@@ -24,7 +24,7 @@ streamlit run src/app.py
 
 ### 3. Manual Retraining (Optional)
 ```bash
-python src/retrain_manual.py
+python src/scripts/retrain_manual.py
 ```
 
 Manually trigger the retraining pipeline when you have new data.
@@ -62,17 +62,17 @@ User Uploads CSV → Saved to data/new/
 
 ### View Deployment History
 ```bash
-python src/rollback.py --list
+python src/scripts/rollback.py --list
 ```
 
 ### Rollback to Previous Version
 ```bash
-python src/rollback.py
+python src/scripts/rollback.py
 ```
 
 ### Rollback to Specific Version
 ```bash
-python src/rollback.py --version 1.2
+python src/scripts/rollback.py --version 1.2
 ```
 
 ### Check System Status
@@ -170,8 +170,8 @@ All model versions include:
 
 ### Rollback Needed
 ```bash
-python src/rollback.py --list  # See history
-python src/rollback.py         # Rollback to previous
+python src/scripts/rollback.py --list  # See history
+python src/scripts/rollback.py         # Rollback to previous
 ```
 
 ---
