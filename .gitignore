@@ -11,16 +11,23 @@ __pycache__/
 .DS_Store
 .ipynb_checkpoints/
 
-# Virtual Environment
+# Virtual environment
 venv/
 .env/
 
 # Streamlit
-.streamlit/
+# Keep the config file (you already have it)
+!.streamlit/config.toml
 
-# Data & models (optional, only if large files)
-data/
-models/
+# Data (keep the sample CSV and .gitkeep placeholders)
+data/sample_data.csv
+data/new/.gitkeep
+data/training/.gitkeep
+data/archive/.gitkeep
 
-# VS Code
-.vscode/
+# Models (keep all model files for this demo)
+models/**
+
+# Logs (keep the deployment log, ignore raw logs)
+logs/deployments.json
+logs/.gitkeep

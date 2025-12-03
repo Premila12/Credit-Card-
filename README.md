@@ -1,51 +1,152 @@
-# Early Risk Signal System
+# HDFC Credit Card Risk Early Warning System
 
-A data-driven framework to identify early behavioral signals of credit card delinquency.
+## 🎯 Overview
+ML-powered risk monitoring dashboard with automated continuous learning capabilities for early detection of credit card delinquency.
 
-## Project Structure
+## 🚀 Quick Start
 
-- **`src/`**: Source code for the application.
-    - `app.py`: Main Streamlit dashboard (Frontend & Backend).
-    - `risk_engine.py`: Core logic for risk scoring.
-    - `data_loader.py`: Data ingestion and validation.
-- **`data/`**: Input datasets.
-- **`notebooks/`**: Jupyter notebooks for analysis and model development.
+### 1. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-## Architecture
+### 2. Initialize System (One-Time)
+```bash
+python src/initialize_cl_system.py
+```
 
-This project uses **Streamlit**, a modern framework that combines Frontend (UI) and Backend (Python Logic) into a single, lightweight application. 
+### 3. Run Dashboard
+```bash
+streamlit run src/app.py
+```
 
-- **Why Streamlit?** For data science and risk analytics, Streamlit allows for rapid prototyping and interactive visualizations without the overhead of managing separate React/Angular frontends and Flask/Django backends.
-- **Scalability**: If the application needs to scale to thousands of concurrent users, we can split the backend into a FastAPI service and keep Streamlit (or move to React) for the frontend.
+Access at: **http://localhost:8501**
 
-## Environment Setup
+---
 
-It is recommended to use a virtual environment to manage dependencies.
+## 📁 Project Structure
 
-1. **Run the Setup Script** (Windows):
-   Double-click `setup_env.bat` or run:
-   ```cmd
-   setup_env.bat
-   ```
+```
+HDFC_Credit_Card/
+├── data/
+│   ├── sample_data.csv       # Sample customer data
+│   ├── new/                  # Uploaded files (staging)
+│   ├── training/             # Master training dataset
+│   └── archive/              # Processed files
+├── models/
+│   ├── active/               # Current production model
+│   ├── versions/             # Historical model versions
+│   ├── metadata/             # Model performance logs
+│   └── risk_model.pkl        # Initial trained model
+├── notebooks/
+│   └── risk_model_development.ipynb  # EDA & model development
+├── src/
+│   ├── app.py                # Streamlit dashboard
+│   ├── risk_engine.py        # Risk scoring engine
+│   ├── data_loader.py        # Data loading utilities
+│   ├── train_model.py        # Model training script
+│   ├── convert_data.py       # Excel to CSV converter
+│   ├── ml_pipeline/          # Continuous learning modules
+│   │   ├── data_manager.py
+│   │   ├── model_trainer.py
+│   │   ├── model_validator.py
+│   │   ├── model_deployer.py
+│   │   └── scheduler.py
+│   ├── retrain_manual.py     # Manual retraining trigger
+│   ├── rollback.py           # Model rollback utility
+│   └── initialize_cl_system.py
+├── assets/
+│   └── logo.png              # HDFC Bank logo
+├── logs/
+│   ├── retraining.log        # Training logs
+│   └── deployments.json      # Deployment history
+└── .streamlit/
+    └── config.toml           # Streamlit theme config
+```
 
-2. **Manual Setup**:
-   ```bash
-   python -m venv venv
-   .\venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+---
 
-## How to Run
+## 🎓 Features
 
-1. **Activate Environment** (if not already active):
-   ```bash
-   .\venv\Scripts\activate
-   ```
+### Dashboard
+- **Portfolio Overview**: Risk distribution, metrics, charts
+- **Customer Investigation**: Detailed customer profiles with risk radar
+- **High Risk Alerts**: Actionable list of customers needing intervention
+- **Drilldown**: Advanced filtering and analysis
+- **Smart Search**: Type customer ID to see risk status
+- **Real-Time Upload**: Upload CSV files for instant analysis
 
-2. **Run the Dashboard**:
-   ```bash
-   streamlit run src/app.py
-   ```
+### Continuous Learning System
+- **Automated Retraining**: Daily checks at 2 AM
+- **Model Validation**: Performance comparison and drift detection
+- **Safe Deployment**: Version control with rollback capability
+- **Full Logging**: Audit trail for all operations
 
-3. **Explore the Model**:
-   Open `notebooks/risk_model_development.ipynb` in Jupyter.
+---
+
+## 🛠️ Usage
+
+### Upload New Data
+1. Open dashboard sidebar
+2. Upload CSV file
+3. Data automatically saved for future training
+
+### Manual Retraining
+```bash
+python src/retrain_manual.py
+```
+
+### Start Automated Scheduler
+```bash
+python src/ml_pipeline/scheduler.py
+```
+
+### Rollback Model
+```bash
+# View history
+python src/rollback.py --list
+
+# Rollback to previous
+python src/rollback.py
+
+# Rollback to specific version
+python src/rollback.py --version 1.2
+```
+
+---
+
+## 📊 Model Details
+
+- **Algorithm**: Random Forest Classifier
+- **Features**: Utilization, payment ratio, cash withdrawal, spending trends
+- **Output**: Risk scores (0-100) and tiers (Intervene/Engage/Monitor)
+- **Class Imbalance**: Handled with balanced class weights
+
+---
+
+## 📖 Documentation
+
+- **User Guide**: `CONTINUOUS_LEARNING_GUIDE.md`
+- **Walkthrough**: See artifacts directory
+
+---
+
+## 🔐 Requirements
+
+- Python 3.8+
+- streamlit
+- pandas
+- plotly
+- scikit-learn
+- joblib
+- schedule
+
+---
+
+## 📞 Support
+
+For detailed instructions, see `CONTINUOUS_LEARNING_GUIDE.md`
+
+---
+
+**Status**: ✅ Production Ready

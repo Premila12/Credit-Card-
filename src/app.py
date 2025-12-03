@@ -9,7 +9,8 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from data_loader import load_data
-from risk_engine import calculate_risk_scores
+from risk_engine import calculate_risk_scores, get_active_model_info
+from ml_pipeline.data_manager import DataManager
 
 # --- Configuration ---
 st.set_page_config(
@@ -66,8 +67,25 @@ with st.sidebar:
     
     if uploaded_file is not None:
         st.success("File Uploaded Successfully!")
+        # Save uploaded file for future training
+        try:
+            data_manager = DataManager()
+            data_manager.store_new_data(uploaded_file, uploaded_file.name)
+            st.caption("📊 Data saved for model improvement")
+        except Exception as e:
+            st.warning(f"Could not save file: {str(e)}")
     else:
         st.info("Loading sample data automatically...")
+    
+    # Display active model info
+    st.markdown("---")
+    try:
+        model_info = get_active_model_info()
+        st.caption(f"**Model:** v{model_info['version']}")
+        if model_info['date'] != 'N/A':
+            st.caption(f"**Updated:** {model_info['date'][:10]}")
+    except:
+        pass
 
 # --- Data Loading ---
 @st.cache_data

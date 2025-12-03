@@ -1,8 +1,9 @@
 pandas
 numpy
 streamlit
+pandas
 plotly
-matplotlib
-seaborn
-ipykernel
+scikit-learn
+joblib
 openpyxl
+schedule
