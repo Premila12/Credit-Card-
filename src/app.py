@@ -8,8 +8,8 @@ import os
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from data_loader import load_data
-from risk_engine import calculate_risk_scores, get_active_model_info
+from utils.data_loader import load_data
+from utils.risk_engine import calculate_risk_scores, get_active_model_info
 from ml_pipeline.data_manager import DataManager
 
 # --- Configuration ---
@@ -19,18 +19,6 @@ st.set_page_config(
     page_icon="🛡️",
     initial_sidebar_state="collapsed"
 )
-
-# --- Load CSS ---
-def load_css():
-    css_path = os.path.join(os.path.dirname(__file__), "style.css")
-    if os.path.exists(css_path):
-        with open(css_path) as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-load_css()
-
-import base64
-
 # --- Helper: Load Image as Base64 ---
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:

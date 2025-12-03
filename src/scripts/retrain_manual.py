@@ -7,7 +7,7 @@ import sys
 import os
 
 # Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from ml_pipeline.scheduler import RetrainingScheduler
 
@@ -15,11 +15,6 @@ def main():
     print("="*60)
     print("HDFC Credit Risk Model - Manual Retraining")
     print("="*60)
-    
-    scheduler = RetrainingScheduler()
-    
-    print("\nStarting retraining pipeline...")
-    report = scheduler.run_pipeline()
     
     print("\n" + "="*60)
     print("PIPELINE EXECUTION REPORT")

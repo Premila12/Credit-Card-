@@ -22,7 +22,7 @@ def initialize_system():
     
     if not os.path.exists(current_model_path):
         print("\n❌ Error: No trained model found at models/risk_model.pkl")
-        print("Please run 'python src/train_model.py' first")
+        print("Please run 'python src/scripts/train_model.py' first")
         return False
     
     # Copy current model to active directory
@@ -95,7 +95,7 @@ def initialize_system():
     print("="*60)
     print("\nNext steps:")
     print("1. Upload new data via the dashboard sidebar")
-    print("2. Run manual retraining: python src/retrain_manual.py")
+    print("2. Run manual retraining: python src/scripts/retrain_manual.py")
     print("3. Start scheduler: python src/ml_pipeline/scheduler.py")
     print("\n")
     

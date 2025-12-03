@@ -7,18 +7,13 @@ import sys
 import os
 import argparse
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from ml_pipeline.model_deployer import ModelDeployer
 
 def main():
     parser = argparse.ArgumentParser(description='Rollback to a previous model version')
     parser.add_argument('--version', type=str, help='Specific version to rollback to (e.g., 1.2)')
-    parser.add_argument('--list', action='store_true', help='List deployment history')
-    
-    args = parser.parse_args()
-    
-    deployer = ModelDeployer()
     
     if args.list:
         print("="*60)
