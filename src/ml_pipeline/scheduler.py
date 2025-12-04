@@ -7,10 +7,10 @@ import schedule
 import time
 from datetime import datetime
 import logging
-from data_manager import DataManager
-from model_trainer import ModelTrainer
-from model_validator import ModelValidator
-from model_deployer import ModelDeployer
+from .data_manager import DataManager
+from .model_trainer import ModelTrainer
+from .model_validator import ModelValidator
+from .model_deployer import ModelDeployer
 from sklearn.model_selection import train_test_split
 
 logging.basicConfig(

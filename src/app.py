@@ -4,6 +4,8 @@ import plotly.graph_objects as go
 import pandas as pd
 import sys
 import os
+import base64
+import io 
 
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -19,14 +21,36 @@ st.set_page_config(
     page_icon="🛡️",
     initial_sidebar_state="collapsed"
 )
+
 # --- Helper: Load Image as Base64 ---
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
+# --- Validate CSV Format ---
+def validate_csv_format(df):
+    """Check if CSV has required columns"""
+    required_cols = [
+        'customer_id', 
+        'utilisation_pct', 
+        'avg_payment_ratio',
+        'cash_withdrawal_pct', 
+        'recent_spend_change_pct'
+    ]
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        return False, required_cols, missing
+    return True, required_cols, []
+
+# --- Load CSS ---
+css_path = os.path.join(os.path.dirname(__file__), "assets", "style.css")
+if os.path.exists(css_path):
+    with open(css_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 # --- Header (Pure HTML for perfect centering) ---
-logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "logo.png")
+logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
 if os.path.exists(logo_path):
     logo_base64 = get_base64_of_bin_file(logo_path)
     logo_html = f'<img src="data:image/png;base64,{logo_base64}" class="logo-img">'
@@ -35,16 +59,13 @@ else:
 
 st.markdown(
     f"""
-    <div style="text-align: center;">
+    <div class="logo-container">
         {logo_html}
-        <div class="welcome-text">Welcome to Credit Card Risk Analyzer</div>
+        <div class="welcome-text">Credit Card Delinquency Watch</div>
     </div>
     """,
     unsafe_allow_html=True
 )
-
-# Search Bar (Centered below or Top Right)
-# Streamlit layout is flow-based. We will put search in a column layout BELOW the header.
 
 # --- Sidebar (Data Upload) ---
 with st.sidebar:
@@ -55,13 +76,42 @@ with st.sidebar:
     
     if uploaded_file is not None:
         st.success("File Uploaded Successfully!")
-        # Save uploaded file for future training
+        # Validate format immediately after upload
         try:
-            data_manager = DataManager()
-            data_manager.store_new_data(uploaded_file, uploaded_file.name)
-            st.caption("📊 Data saved for model improvement")
+            temp_df = pd.read_csv(uploaded_file)
+            is_valid, required_cols, missing_cols = validate_csv_format(temp_df)
+            
+            if not is_valid:
+                st.error(f"❌ Invalid CSV Format!")
+                st.error(f"Missing columns: `{', '.join(missing_cols)}`")
+                with st.expander("📋 Required Columns"):
+                    st.markdown("""
+                    Your CSV must contain these columns:
+                    - `customer_id`: Unique identifier (e.g., C001, C002)
+                    - `utilisation_pct`: Credit utilization % (0-100)
+                    - `avg_payment_ratio`: Average payment ratio % (0-100)
+                    - `cash_withdrawal_pct`: Cash withdrawal % (0-100)
+                    - `recent_spend_change_pct`: Recent spend change % (-100 to 100)
+                    
+                    **Example row:**
+                    | customer_id | utilisation_pct | avg_payment_ratio | cash_withdrawal_pct | recent_spend_change_pct |
+                    |---|---|---|---|---|
+                    | C001 | 45 | 85 | 15 | 10 |
+                    """)
+                uploaded_file = None  # Reset to use sample data
+            else:
+                # Reset file pointer before saving (file was already read for validation)
+                uploaded_file.seek(0)
+                # Save uploaded file for future training
+                try:
+                    data_manager = DataManager()
+                    data_manager.store_new_data(uploaded_file, uploaded_file.name)
+                    st.caption("📊 Data saved for model improvement")
+                except Exception as e:
+                    st.warning(f"Could not save file: {str(e)}")
         except Exception as e:
-            st.warning(f"Could not save file: {str(e)}")
+            st.error(f"Error reading file: {str(e)}")
+            uploaded_file = None
     else:
         st.info("Loading sample data automatically...")
     
@@ -75,30 +125,47 @@ with st.sidebar:
     except:
         pass
 
-# --- Data Loading ---
+# --- Data Loading with Caching ---
 @st.cache_data
-def get_data(uploaded_file):
-    if uploaded_file is not None:
-        df = load_data(uploaded_file)
-    else:
-        sample_path = r"c:\HDFC_Credit_Card\data\sample_data.csv"
-        if os.path.exists(sample_path):
-            df = load_data(sample_path)
-        else:
+def process_data(data_source):
+    """Load and process data with error handling"""
+    try:
+        # Load data
+        df = load_data(data_source)
+        
+        if df is None:
             return None
-            
-    if df is not None:
+        
+        # Validate format
+        is_valid, required_cols, missing_cols = validate_csv_format(df)
+        if not is_valid:
+            st.error(f" Data validation failed!")
+            st.error(f"Missing columns: `{', '.join(missing_cols)}`")
+            return None
+        
+        # Calculate risk scores
         return calculate_risk_scores(df)
-    return None
+    
+    except Exception as e:
+        st.error(f"Error processing data: {str(e)}")
+        return None
 
-df = get_data(uploaded_file)
+# Load data (prioritize uploaded file, fallback to sample)
+if uploaded_file is not None:
+    df = process_data(uploaded_file)
+else:
+    sample_path = os.path.join(os.path.dirname(__file__), "..", "data", "sample_data.csv")
+    if os.path.exists(sample_path):
+        df = process_data(sample_path)
+    else:
+        st.error("Sample data not found. Please upload a CSV file.")
+        st.stop()
 
 if df is None:
-    st.error("Data not found. Please upload a CSV file or ensure 'data/sample_data.csv' exists.")
+    st.error("Failed to process data. Please check file format and try again.")
     st.stop()
 
 # --- Search Logic ---
-# We'll put search just above tabs, aligned right
 c_fill, c_search = st.columns([5, 2])
 with c_search:
     search_query = st.text_input("Search Customer ID", placeholder="e.g., C005", label_visibility="collapsed")
@@ -218,10 +285,8 @@ with tabs[2]:
     st.markdown("###  High-Risk Accounts Detected 🚨")
     high_risk_df = df[df['risk_tier'] == 'Intervene'].copy()
     if not high_risk_df.empty:
-        # Add serial number and reset index to remove unnamed column
         high_risk_df_display = high_risk_df.reset_index(drop=True)
         high_risk_df_display.insert(0, 'Sl No', range(1, len(high_risk_df_display) + 1))
-        # Display without index to avoid duplicate numbering
         st.write(high_risk_df_display.to_html(index=False), unsafe_allow_html=True)
     else:
         st.success("No High-Risk accounts detected.")
@@ -252,11 +317,8 @@ with tabs[3]:
     filtered_df = filtered_df.sort_values('risk_score', ascending=False).head(top_n)
     
     if not filtered_df.empty:
-        # Add serial number and reset index to remove unnamed column
         filtered_df_display = filtered_df.reset_index(drop=True)
         filtered_df_display.insert(0, 'Sl No', range(1, len(filtered_df_display) + 1))
-        # Display without index to avoid duplicate numbering
         st.write(filtered_df_display.to_html(index=False), unsafe_allow_html=True)
     else:
         st.warning("No customers match the selected filters.")
-
